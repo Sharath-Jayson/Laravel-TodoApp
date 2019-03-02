@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+Use Session;
+
 use App\Todo;
 use Illuminate\Http\Request;
 
@@ -17,7 +19,7 @@ class TodosController extends Controller
         //
         $todos =Todo::all();
 
-        return view('todos')->with('todos', $todos);
+        return view('todos', compact('todos'));
     }
 
     /**
@@ -46,9 +48,54 @@ class TodosController extends Controller
 
         $todo->save();
 
+        Session::flash('success', 'Your TODO task was created!');
+
         return back();
 
 
+    }
+
+    public function delete($id)
+    {
+        //
+       $todo = Todo::find($id);
+
+       $todo->delete();
+
+       Session::flash('success', 'YOur Task has been deleted.');
+
+       return back();
+    }
+
+    public function edit($id)
+    {
+        //
+       $todo = Todo::find($id);
+
+       return view('edit', compact('todo'));
+    }
+
+    public function save(Request $request, $id)
+    {
+
+        $todo = Todo::find($id);
+ 
+        $todo->todo = $request->todo;
+        $todo->save();
+        Session::flash('success', 'YOur Task has been Updated.');
+        return redirect()->route('todos');
+
+    }
+
+    public function completed($id)
+    {
+        $todo = Todo::find($id);
+        
+        $todo->completed = 1;
+        
+        $todo->save();
+        Session::flash('success', 'YOur Task has been marked as completed.');
+        return back();
     }
 
     /**
@@ -62,16 +109,7 @@ class TodosController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Todo  $todo
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Todo $todo)
-    {
-        //
-    }
+    
 
     /**
      * Update the specified resource in storage.
@@ -83,6 +121,7 @@ class TodosController extends Controller
     public function update(Request $request, Todo $todo)
     {
         //
+
     }
 
     /**
